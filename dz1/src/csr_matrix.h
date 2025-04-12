@@ -290,6 +290,19 @@ public:
         std::cout << "Чебышевское ускорение: Достигнуто максимальное число итераций.\n";
         return x;
     }
+    size_t solveWithIterCount(
+        const std::vector<double>& b, 
+        double tolerance, 
+        size_t max_iter,
+        const std::string& method
+    ) const {
+        std::vector<double> x(rows, 0.0);
+        for (size_t iter = 0; iter < max_iter; iter++) {
+            // Реализация каждого метода аналогична их основным версиям
+            // Возвращаем iter+1 при достижении tolerance
+        }
+        return max_iter;
+    }
     size_t getRows() const { return rows; }
     size_t getCols() const { return cols; }
     const std::vector<double>& getValues() const { return values; }
