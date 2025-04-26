@@ -171,7 +171,8 @@ public:
         return x;
     }
 
-
+   
+    
     std::vector<double> simpleIteration(const std::vector<double>& b, double tau = 0.1, double tolerance = 1e-6, size_t max_iterations = 1000) const {
         if (b.size() != rows) {
             throw std::invalid_argument("Vector size must match matrix rows");
@@ -290,6 +291,18 @@ public:
         std::cout << "Чебышевское ускорение: Достигнуто максимальное число итераций.\n";
         return x;
     }
+    CSRMatrix transpose() const {
+        std::map<std::pair<size_t, size_t>, double> dok;
+        
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t k = row_ptr[i]; k < row_ptr[i + 1]; k++) {
+                size_t j = col_indices[k];
+                dok[{j, i}] = values[k]; 
+            }
+        }
+        
+        return CSRMatrix(dok, cols, rows); 
+    }
     size_t solveWithIterCount(
         const std::vector<double>& b, 
         double tolerance, 
@@ -298,8 +311,7 @@ public:
     ) const {
         std::vector<double> x(rows, 0.0);
         for (size_t iter = 0; iter < max_iter; iter++) {
-            // Реализация каждого метода аналогична их основным версиям
-            // Возвращаем iter+1 при достижении tolerance
+           
         }
         return max_iter;
     }
@@ -309,4 +321,57 @@ public:
     const std::vector<size_t>& getColIndices() const { return col_indices; }
     const std::vector<size_t>& getRowPtr() const { return row_ptr; }
 };
+
+inline std::vector<double> operator-(const std::vector<double>& a, const std::vector<double>& b) {
+    if (a.size() != b.size()) {
+        throw std::invalid_argument("Vectors must have same size for subtraction");
+    }
+    
+    std::vector<double> result(a.size());
+    for (size_t i = 0; i < a.size(); ++i) {
+        result[i] = a[i] - b[i];
+    }
+    return result;
+}
+
+inline std::vector<double> operator+(const std::vector<double>& a, const std::vector<double>& b) {
+    if (a.size() != b.size()) {
+        throw std::invalid_argument("Vectors must have same size for addition");
+    }
+    std::vector<double> result(a.size());
+    for (size_t i = 0; i < a.size(); ++i) {
+        result[i] = a[i] + b[i];
+    }
+    return result;
+}
+
+inline std::vector<double> operator*(double scalar, const std::vector<double>& vec) {
+    std::vector<double> result(vec.size());
+    for (size_t i = 0; i < vec.size(); ++i) {
+        result[i] = scalar * vec[i];
+    }
+    return result;
+}
+inline CSRMatrix operator*(double scalar, const CSRMatrix& mat) {
+    std::map<std::pair<size_t, size_t>, double> dok;
+    
+    for (size_t i = 0; i < mat.getRows(); i++) {
+        for (size_t k = mat.getRowPtr()[i]; k < mat.getRowPtr()[i+1]; k++) {
+            size_t j = mat.getColIndices()[k];
+            dok[{i, j}] = mat.getValues()[k] * scalar;
+        }
+    }
+    
+    return CSRMatrix(dok, mat.getRows(), mat.getCols());
+}
+inline double dotProduct(const std::vector<double>& a, const std::vector<double>& b) {
+    if (a.size() != b.size()) {
+        throw std::invalid_argument("Vectors must have same size for dot product");
+    }
+    double result = 0.0;
+    for (size_t i = 0; i < a.size(); ++i) {
+        result += a[i] * b[i];
+    }
+    return result;
+}
 #endif               
